@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 
 @Injectable()
 export class AuthService {
-    constructor(private prismaService: PrismaService) {}
+    constructor(private prismaService: PrismaService, private jwtService: JwtService) {}
 
     async login(dto: AuthDto): Promise<any> {
         // check user exists
@@ -23,6 +24,17 @@ export class AuthService {
             delete user.id;
             return user;
         }
-        return '';
+        return userExists;
+    }
+
+    signToken(userId: string, email: string, username: string): Promise<string> {
+        const payload = {
+            sub: userId,
+            email,
+            username
+        }
+        return this.jwtService.signAsync(payload, {
+            expiresIn: '15m'
+        })
     }
 }
