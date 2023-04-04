@@ -3,12 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto';
-import { OAuth2Client } from 'google-auth-library';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { LoginDto } from './dto/Login.dto';
-import { TokenPayload } from 'google-auth-library/build/src/auth/loginticket';
-
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +26,14 @@ export class AuthService {
             return this.signToken(user.id, user.email, user.username);
             } catch (err) {
                 if(err instanceof PrismaClientKnownRequestError) {
-                    if(err.code === 'P2002') throw new ForbiddenException("User exists!")
+                    if(err.code === 'P2002') {
+                        if(err.meta.target === 'users_email_key') {
+                            throw new ForbiddenException("This email is already taken!");
+                        }
+                        if(err.meta.target === 'users_username_key') {
+                            throw new ForbiddenException("This username is already taken!");
+                        }
+                    }
                 }
                 throw err;
             }
@@ -54,13 +58,14 @@ export class AuthService {
             }
     }
 
-    async verifyGoogleToken(token: string): Promise<TokenPayload> {
+    async verifyGoogleToken(token: string): Promise<{email: string, email_verified: true, locale: true}> {
         try {
-            const google_token = await googleClient.verifyIdToken({
-                idToken: token,
-                audience: this.configService.get("GOOGLE_CLIENT_ID"),
+            const { data } = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
-            return google_token.getPayload();
+            return data;
         } catch (err) {
             throw new UnauthorizedException(err.message);
         }
