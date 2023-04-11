@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class RegisterDto {
+export class RegisterWeb3Dto {
     @IsString()
     @IsNotEmpty()
-    token: string;
+    address: string;
 
     @IsString()
     @IsNotEmpty()
