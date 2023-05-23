@@ -138,7 +138,7 @@ export class AuthService {
             username
         }
         return this.jwtService.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '60m',
             secret: this.configService.get("JWT_SECRET")
         })
     }
@@ -150,7 +150,7 @@ export class AuthService {
             username
         }
         return this.jwtService.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '60m',
             secret: this.configService.get("JWT_SECRET")
         })
     }

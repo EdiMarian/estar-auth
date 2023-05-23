@@ -7,7 +7,7 @@ import { User } from '@prisma/client';
 export class UserService {
     constructor(private prismaService: PrismaService) {}
 
-    async linkMultiversXWallet(userId: string, address: string): Promise<User> {
+    async linkAddress(userId: string, address: string): Promise<User> {
         try {
             new Address(address);
         } catch {
@@ -20,6 +20,20 @@ export class UserService {
             },
             data: {
                 address: address
+            }
+        });
+
+        delete user.id;
+        return user;
+    }
+
+    async linkEmail(userId: string, email: string): Promise<User> {
+        const user = await this.prismaService.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                email: email
             }
         });
 
