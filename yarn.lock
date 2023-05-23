@@ -819,10 +819,10 @@
     "tslib" "2.5.0"
     "uid" "2.0.1"
 
-"@nestjs/config@^2.3.1":
-  "integrity" "sha512-Ckzel0NZ9CWhNsLfE1hxfDuxJuEbhQvGxSlmZ1/X8awjRmAA/g3kT6M1+MO1SHj1wMtPyUfd9WpwkiqFbiwQgA=="
-  "resolved" "https://registry.npmjs.org/@nestjs/config/-/config-2.3.1.tgz"
-  "version" "2.3.1"
+"@nestjs/config@^2.3.2":
+  "integrity" "sha512-VtGV8PBpxzMzz68kdxTWqPm9v7SYCSZXQ0tC72AMNnjdmU+CVjUSLpEpdnm0XcWHxE1nV6wSI3HZxsATIV4ZxA=="
+  "resolved" "https://registry.npmjs.org/@nestjs/config/-/config-2.3.2.tgz"
+  "version" "2.3.2"
   dependencies:
     "dotenv" "16.0.3"
     "dotenv-expand" "10.0.0"
