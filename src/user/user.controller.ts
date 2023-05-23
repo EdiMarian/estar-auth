@@ -3,7 +3,7 @@ import { JwtGuard } from '../auth/guard';
 import { GetUser } from './decorator';
 import { UserService } from './user.service';
 
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
     constructor(private userService: UserService) {}
@@ -12,4 +12,10 @@ export class UserController {
     // getUser(@GetUser() user: User): User {
     //     return user;
     // }
+
+    @Get('/')
+    getUsers() {
+        return this.userService.getUsers();
+    }
+
 }

@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { CosmosService } from './cosmos.service';
 
+@Global()
 @Module({
-  providers: [CosmosService]
+  providers: [CosmosService],
+  exports: [CosmosService],
 })
 export class CosmosModule {}
