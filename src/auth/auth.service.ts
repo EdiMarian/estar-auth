@@ -2,10 +2,28 @@ import { Injectable, UnauthorizedException, ForbiddenException, NotFoundExceptio
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { RegisterDto } from './dto';
+import { UserRepository } from '../user/repository/user.repository';
+import { User } from 'src/common/types';
 
 @Injectable()
 export class AuthService {
-    constructor(private jwtService: JwtService, private configService: ConfigService) {}
+    constructor(private readonly userRepository: UserRepository,private jwtService: JwtService, private configService: ConfigService) {}
+
+    async register(dto: RegisterDto): Promise<User> {
+        const address = await this.userRepository.findAddress(dto.address);
+        if(address.length > 0) {
+            throw new ForbiddenException("Address already exists");
+        }
+        const username = await this.userRepository.findUsername(dto.username);
+        if(username.length > 0) {
+            throw new ForbiddenException("Username already exists");
+        }
+
+        const user = await this.userRepository.createUser(dto);
+
+        return user;
+    }
 
     async verifyGoogleToken(token: string): Promise<{email: string, email_verified: true, locale: true}> {
         try {

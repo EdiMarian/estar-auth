@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get } from '@nestjs/common';
+import { Controller, UseGuards, Get, Param } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from './decorator';
 import { UserService } from './user.service';
@@ -17,5 +17,4 @@ export class UserController {
     getUsers() {
         return this.userService.getUsers();
     }
-
 }

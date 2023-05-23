@@ -16,4 +16,8 @@ export class CosmosService {
     users(): Container {
         return this.database.container('users');
     }
+
+    userAddresses(): Container {
+        return this.database.container('userAddresses');
+    }
 }

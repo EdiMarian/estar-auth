@@ -1,15 +1,17 @@
 interface User {
     id: string;
     username: string;
-    addresses: Address[];
+    addresses: string[];
 }
 
-interface Address {
+interface UserAddress {
+    id: string;
+    userId: string;
     chain: string;
     address: string;
 }
 
 export {
     User,
-    Address
+    UserAddress
 }
