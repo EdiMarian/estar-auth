@@ -16,16 +16,6 @@ export class AuthService {
         // Deconstruct DTO
         const { username, chain, address } = dto;
 
-        // Username Validation
-        const usernamesFound = await this.userRepository.findUsername(username);
-        if(usernamesFound.length > 0) {
-            throw new ForbiddenException("Username already exists");
-        }
-
-        if(!isValidString(username)) {
-            throw new ForbiddenException("Invalid username");
-        }
-
         // Chain validation
         const chains = this.getChains();
         if(!chains.includes(chain)) {
@@ -41,6 +31,16 @@ export class AuthService {
         const addressesFound = await this.userRepository.findAddress(dto.address);
         if(addressesFound.length > 0) {
             throw new ForbiddenException("Address already exists");
+        }
+
+        // Username Validation
+        const usernamesFound = await this.userRepository.findUsername(username);
+        if(usernamesFound.length > 0) {
+            throw new ForbiddenException("Username already exists");
+        }
+
+        if(!isValidString(username)) {
+            throw new ForbiddenException("Invalid username");
         }
 
         // Create User
