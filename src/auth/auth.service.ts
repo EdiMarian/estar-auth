@@ -11,7 +11,7 @@ import { isValidString } from 'src/common/functions';
 export class AuthService {
     constructor(private readonly userRepository: UserRepository,private jwtService: JwtService, private configService: ConfigService) {}
 
-    async register(dto: RegisterDto): Promise<User> {
+    async register(dto: RegisterDto): Promise<string> {
 
         // Deconstruct DTO
         const { username, chain, address } = dto;
@@ -44,26 +44,15 @@ export class AuthService {
 
         const user = await this.userRepository.createUser(dto);
 
-        return user;
+        return this.signToken(user.id, user.username, chain, dto.address);
     }
 
-    signWeb2Token(userId: string, email: string, username: string): Promise<string> {
+    signToken(userId: string, username: string, chain: string, address: string): Promise<string> {
         const payload = {
             sub: userId,
-            email,
-            username
-        }
-        return this.jwtService.signAsync(payload, {
-            expiresIn: '60m',
-            secret: this.configService.get("JWT_SECRET")
-        })
-    }
-
-    signWeb3Token(userId: string, address: string, username: string): Promise<string> {
-        const payload = {
-            sub: userId,
-            address,
-            username
+            username,
+            chain,
+            address
         }
         return this.jwtService.signAsync(payload, {
             expiresIn: '60m',
