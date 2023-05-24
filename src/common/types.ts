@@ -11,7 +11,12 @@ interface UserAddress {
     address: string;
 }
 
+interface Token {
+    token: string;
+}
+
 export {
     User,
-    UserAddress
+    UserAddress,
+    Token
 }

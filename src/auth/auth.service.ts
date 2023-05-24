@@ -2,15 +2,16 @@ import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/c
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { RegisterDto } from './dto';
+import { LoginDto, RegisterDto } from './dto';
 import { UserRepository } from '../user/repository/user.repository';
 import { isValidString } from 'src/common/functions';
+import { Token } from 'src/common/types';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly userRepository: UserRepository,private jwtService: JwtService, private configService: ConfigService) {}
 
-    async register(dto: RegisterDto): Promise<string> {
+    async register(dto: RegisterDto): Promise<Token> {
 
         // Deconstruct DTO
         const { username, chain, address } = dto;
@@ -32,18 +33,55 @@ export class AuthService {
         }
 
         // Address Validation
-        const addressesFound = await this.userRepository.findAddress(address);
-        if(addressesFound.length > 0) {
-            throw new ForbiddenException("Address already exists");
-        }
         if(chain === chains[0]) {
             const { email } = await this.verifyGoogleToken(address);
             dto.address = email;
         }
 
-        const user = await this.userRepository.createUser(dto);
+        const addressesFound = await this.userRepository.findAddress(dto.address);
+        if(addressesFound.length > 0) {
+            throw new ForbiddenException("Address already exists");
+        }
 
-        return this.signToken(user.id, user.username, chain, dto.address);
+        // Create User
+        const user = await this.userRepository.createUser(dto);
+        return {
+            token: await this.signToken(user.id, user.username, chain, dto.address),
+        };
+    }
+
+    async login(dto: LoginDto): Promise<Token> {
+        const { chain, address } = dto;
+
+        // Chain validation
+        const chains = this.getChains();
+        if(!chains.includes(chain)) {
+            throw new ForbiddenException("Chain not supported");
+        }
+
+        // Address Validation
+        if(chain === chains[0]) {
+            const { email } = await this.verifyGoogleToken(address);
+            dto.address = email;
+        }
+
+        const addressesFound = await this.userRepository.findAddress(dto.address);
+        if(addressesFound.length === 0) {
+            throw new UnauthorizedException("Address not found");
+        }
+
+        // Get User
+        const user = await this.userRepository.findOne(addressesFound[0].userId);
+
+        // Validate User
+        if(!user) {
+            throw new UnauthorizedException("User not found");
+        }
+
+        // Sign Token
+        return {
+            token: await this.signToken(user.id, user.username, chain, dto.address),
+        };
     }
 
     signToken(userId: string, username: string, chain: string, address: string): Promise<string> {

@@ -15,7 +15,7 @@ export class UserRepository {
     }
 
     async findOne(id: string): Promise<User> {
-        const { resource } = await this.cosmosService.users().item(id).read<User>();
+        const { resource } = await this.cosmosService.users().item(id, id).read<User>();
         return resource;
     }
 
