@@ -2,16 +2,17 @@ import { Controller, UseGuards, Get, Param } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from './decorator';
 import { UserService } from './user.service';
+import { User } from 'src/common/types';
 
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
     constructor(private userService: UserService) {}
 
-    // @Get('/me')
-    // getUser(@GetUser() user: User): User {
-    //     return user;
-    // }
+    @Get('/me')
+    getUser(@GetUser() user: User): User {
+        return user;
+    }
 
     @Get('/')
     getUsers() {
