@@ -3,6 +3,7 @@ import { CosmosService } from '../../cosmos/cosmos.service';
 import { User, UserAddress } from 'src/common/types';
 import { RegisterDto } from 'src/auth/dto';
 import * as uuid4 from 'uuid4';
+import { cleanDocument } from 'src/common/functions';
 
 @Injectable()
 export class UserRepository {
@@ -53,14 +54,17 @@ export class UserRepository {
         const user: User = {
             id: userId,
             username,
-            addresses: [userAddress.id]
+            addressesIDs: [userAddress.id],
         }
 
         const { resource } = await this.cosmosService.users().items.create<User>(user)
-        return resource;
+        return {
+            ...cleanDocument(resource),
+            addresses: [cleanDocument(userAddress)]
+        };
     }
 
-    async creatUserAddress(userId: string, chain: string, address: string): Promise<UserAddress> {
+    private async creatUserAddress(userId: string, chain: string, address: string): Promise<UserAddress> {
         const { resource } = await this.cosmosService.userAddresses().items.create<UserAddress>({
             id: uuid4(),
             userId,

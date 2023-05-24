@@ -1,7 +1,7 @@
 interface User {
     id: string;
     username: string;
-    addresses: string[];
+    addressesIDs: string[];
 }
 
 interface UserAddress {

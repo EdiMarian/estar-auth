@@ -18,6 +18,6 @@ export class CosmosService {
     }
 
     userAddresses(): Container {
-        return this.database.container('userAddresses');
+        return this.database.container('useraddresses');
     }
 }
