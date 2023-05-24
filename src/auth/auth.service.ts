@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { RegisterDto } from './dto';
 import { UserRepository } from '../user/repository/user.repository';
-import { User } from 'src/common/types';
 import { isValidString } from 'src/common/functions';
 
 @Injectable()
