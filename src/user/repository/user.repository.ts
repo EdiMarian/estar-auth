@@ -60,7 +60,7 @@ export class UserRepository {
         const { resource } = await this.cosmosService.users().items.create<User>(user)
         return {
             ...cleanDocument(resource),
-            addresses: [cleanDocument(userAddress)]
+            addresses: [cleanDocument<UserAddress>(userAddress)]
         };
     }
 

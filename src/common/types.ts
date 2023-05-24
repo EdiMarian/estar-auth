@@ -1,10 +1,18 @@
-interface User {
+interface CosmosDocument {
+    _etag?: string;
+    _rid?: string;
+    _self?: string;
+    _attachments?: string;
+    _ts?: number;
+}
+
+interface User extends CosmosDocument {
     id: string;
     username: string;
     addressesIDs: string[];
 }
 
-interface UserAddress {
+interface UserAddress extends CosmosDocument {
     id: string;
     userId: string;
     chain: string;
@@ -16,7 +24,8 @@ interface Token {
 }
 
 export {
+    CosmosDocument,
     User,
     UserAddress,
-    Token
+    Token,
 }

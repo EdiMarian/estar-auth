@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { UserRepository } from '../../user/repository/user.repository';
 import { cleanDocument } from 'src/common/functions';
+import { User, UserAddress } from 'src/common/types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -14,8 +15,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         })
     }
     
-    async validate(payload: any) {
+    async validate(payload: any): Promise<User & {chain: string, address: string}> {
         const user = await this.userRepository.findOne(payload.sub);
-        return cleanDocument(user);
+        const userReturned = {
+            ...cleanDocument<User>(user, 'addresses'),
+            chain: payload.chain,
+            address: payload.address,
+        }
+        return userReturned;
     }
 }
