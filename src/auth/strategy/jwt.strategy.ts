@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { UserRepository } from '../../user/repository/user.repository';
 import { cleanDocument } from 'src/common/functions';
-import { User, UserAddress } from 'src/common/types';
+import { User } from 'src/common/types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -17,6 +17,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     
     async validate(payload: any): Promise<User & {chain: string, address: string}> {
         const user = await this.userRepository.findOne(payload.sub);
+        if(!user) {
+            return null;
+        }
         const userReturned = {
             ...cleanDocument<User>(user, 'addresses'),
             chain: payload.chain,
