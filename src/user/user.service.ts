@@ -32,14 +32,14 @@ export class UserService {
         }
 
         // Address Validation
-        const addressesFound = await this.userRepository.findAddress(address);
-        if(addressesFound.length > 0) {
-            throw new ForbiddenException("Address already exists");
-        }
-
         if(chain === chains[0]) {
             const { email } = await this.authService.verifyGoogleToken(address);
             dto.address = email;
+        }
+
+        const addressesFound = await this.userRepository.findAddress(dto.address);
+        if(addressesFound.length > 0) {
+            throw new ForbiddenException("Address already exists");
         }
 
         // Insert User Address
