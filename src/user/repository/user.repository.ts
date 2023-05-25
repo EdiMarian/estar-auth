@@ -4,6 +4,7 @@ import { User, UserAddress } from 'src/common/types';
 import { RegisterDto } from 'src/auth/dto';
 import * as uuid4 from 'uuid4';
 import { cleanDocument } from 'src/common/functions';
+import { LinkAddressDto } from '../dto';
 
 @Injectable()
 export class UserRepository {
@@ -33,8 +34,22 @@ export class UserRepository {
         return resources;
     }
 
+    async findUserAddresses(userId: string): Promise<UserAddress[]> {
+        const query: string = 'SELECT * FROM c WHERE c.userId = @userId'
+        const { resources } = await this.cosmosService.userAddresses().items.query<UserAddress>({
+            query: query,
+            parameters: [
+                {
+                    name: '@userId',
+                    value: userId
+                }
+            ]
+        }).fetchNext();
+        return resources;
+    }
+
     async findUserAddress(userId: string, addressId: string) {
-        const { resource, requestCharge } = await this.cosmosService.userAddresses().item(addressId, userId).read<UserAddress>();
+        const { resource } = await this.cosmosService.userAddresses().item(addressId, userId).read<UserAddress>();
         return resource;
     }
 
@@ -77,5 +92,29 @@ export class UserRepository {
             address
         });
         return resource;
+    }
+
+    async insertUserAddress(userId: string, dto: LinkAddressDto): Promise<User & { addresses: UserAddress[]}> {
+        // Desctructure the dto
+        const { chain, address } = dto;
+
+        // Create the user address
+        const userAddress = await this.creatUserAddress(userId, chain, address);
+
+        // Get the user
+        const user = await this.findOne(userId);
+
+        // Add the address to the user
+        user.addressesIDs.push(userAddress.id);
+
+        // Update the user
+        const { resource } = await this.cosmosService.users().item(userId, userId).replace<User>(user);
+        const userAddresses = await this.findUserAddresses(userId);
+        return {
+            ...cleanDocument(resource),
+            addresses: [
+                ...userAddresses.map((userAddress: UserAddress) => cleanDocument<UserAddress>(userAddress, 'user'))
+            ]
+        }
     }
 }

@@ -20,11 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         if(!user) {
             return null;
         }
-        const userAddresses = [];
-        for(const addressId of user.addressesIDs) {
-            const userAddress = await this.userRepository.findUserAddress(user.id, addressId);
-            userAddresses.push(cleanDocument<UserAddress>(userAddress));
-        }
+        const userAddresses = await this.userRepository.findUserAddresses(user.id);
         const userReturned = {
             ...cleanDocument<User>(user, 'addresses'),
             connected: {
@@ -32,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
                 address: payload.address
             },
             addresses: [
-                ...userAddresses
+                ...userAddresses.map((userAddress: UserAddress) => cleanDocument<UserAddress>(userAddress, 'user'))
             ],
         }
         return userReturned;
