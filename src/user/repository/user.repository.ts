@@ -79,7 +79,7 @@ export class UserRepository {
 
         const { resource } = await this.cosmosService.users().items.create<User>(user)
         return {
-            ...cleanDocument(resource),
+            ...cleanDocument<User>(resource, 'addresses', true),
             addresses: [cleanDocument<UserAddress>(userAddress)]
         };
     }
@@ -111,7 +111,7 @@ export class UserRepository {
         const { resource } = await this.cosmosService.users().item(userId, userId).replace<User>(user);
         const userAddresses = await this.findUserAddresses(userId);
         return {
-            ...cleanDocument(resource),
+            ...cleanDocument<User>(resource, 'addresses', true),
             addresses: [
                 ...userAddresses.map((userAddress: UserAddress) => cleanDocument<UserAddress>(userAddress, 'user'))
             ]
