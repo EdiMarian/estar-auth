@@ -33,6 +33,11 @@ export class UserRepository {
         return resources;
     }
 
+    async findUserAddress(userId: string, addressId: string) {
+        const { resource, requestCharge } = await this.cosmosService.userAddresses().item(addressId, userId).read<UserAddress>();
+        return resource;
+    }
+
     async findUsername(username: string) {
         const query: string = 'SELECT * FROM c WHERE c.username = @username'
         const { resources } = await this.cosmosService.users().items.query({
