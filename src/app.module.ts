@@ -4,7 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CosmosModule } from './cosmos/cosmos.module';
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}),AuthModule, UserModule, CosmosModule],
+  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, CosmosModule],
   controllers: [],
   providers: [],
 })

@@ -5,10 +5,11 @@ import { User } from 'src/common/types';
 import { ItemDefinition } from '@azure/cosmos';
 import { LinkAddressDto } from './dto';
 import { ConfigService } from '@nestjs/config';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
-    constructor(private readonly userRepository: UserRepository, private readonly configService: ConfigService) {}
+    constructor(private readonly userRepository: UserRepository, private readonly authService: AuthService) {}
 
     getUsers(): Promise<ItemDefinition[]> {
         return this.userRepository.findAll();
@@ -19,7 +20,7 @@ export class UserService {
         const { chain, address } = dto;
 
         // Chain validation
-        const chains = this.getChains();
+        const chains = this.authService.getChains();
         if(!chains.includes(chain)) {
             throw new ForbiddenException("Chain not supported");
         }
@@ -36,12 +37,13 @@ export class UserService {
             throw new ForbiddenException("Address already exists");
         }
 
+        if(chain === chains[0]) {
+            const { email } = await this.authService.verifyGoogleToken(address);
+            dto.address = email;
+        }
+
         // Insert User Address
         const user = await this.userRepository.insertUserAddress(id, dto);
         return user;
-    }
-
-    private getChains(): string[] {
-        return this.configService.get<string>('SUPPORTED_CHAINS').split(',');
     }
 }

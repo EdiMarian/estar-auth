@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         }
         const userAddresses = await this.userRepository.findUserAddresses(user.id);
         const userReturned = {
-            ...cleanDocument<User>(user, 'addresses'),
+            ...cleanDocument<User>(user, 'addresses', true),
             connected: {
                 chain: payload.chain,
                 address: payload.address

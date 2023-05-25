@@ -97,11 +97,11 @@ export class AuthService {
         })
     }
 
-    private getChains(): string[] {
+    getChains(): string[] {
         return this.configService.get("SUPPORTED_CHAINS").split(",");
     }
 
-    private async verifyGoogleToken(token: string): Promise<{email: string, email_verified: true, locale: true}> {
+    async verifyGoogleToken(token: string): Promise<{email: string, email_verified: true, locale: true}> {
         try {
             const { data } = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
                 headers: {
