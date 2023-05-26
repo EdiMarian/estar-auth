@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CosmosService } from '../../cosmos/cosmos.service';
-import { User, UserAddress } from 'src/common/types';
+import { Roles, User, UserAddress } from 'src/common/types';
 import { RegisterDto } from 'src/auth/dto';
 import * as uuid4 from 'uuid4';
 import { cleanDocument } from 'src/common/functions';
@@ -54,8 +54,8 @@ export class UserRepository {
     }
 
     async findUsername(username: string) {
-        const query: string = 'SELECT * FROM c WHERE c.username = @username'
-        const { resources } = await this.cosmosService.users().items.query({
+        const query: string = 'SELECT * FROM c WHERE LOWER(c.username) = LOWER(@username)'
+        const { resources, requestCharge } = await this.cosmosService.users().items.query({
             query: query,
             parameters: [
                 {
@@ -64,6 +64,7 @@ export class UserRepository {
                 }
             ]
         }).fetchNext();
+        console.log(requestCharge)
         return resources;
     }
 
@@ -74,6 +75,7 @@ export class UserRepository {
         const user: User = {
             id: userId,
             username,
+            role: [Roles.MEMBER],
             addressesIDs: [userAddress.id],
         }
 

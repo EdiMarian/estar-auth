@@ -9,6 +9,7 @@ interface CosmosDocument {
 interface User extends CosmosDocument {
     id: string;
     username: string;
+    role: Roles[];
     addressesIDs: string[];
 }
 
@@ -23,9 +24,18 @@ interface Token {
     token: string;
 }
 
+// Enums
+enum Roles {
+    MEMBER = "member",
+    ANALITYCS = "analitycs",
+    MODORATOR = "moderator",
+    ADMIN = "admin",
+}
+
 export {
     CosmosDocument,
     User,
     UserAddress,
     Token,
+    Roles,
 }
