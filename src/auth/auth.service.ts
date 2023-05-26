@@ -6,6 +6,7 @@ import { LoginDto, RegisterDto } from './dto';
 import { UserRepository } from '../user/repository/user.repository';
 import { isValidString } from 'src/common/functions';
 import { Token } from 'src/common/types';
+import { listOfNegativeWords } from 'src/common/constants';
 
 @Injectable()
 export class AuthService {
@@ -42,6 +43,8 @@ export class AuthService {
         if(!isValidString(username)) {
             throw new ForbiddenException("Invalid username");
         }
+        
+        if(listOfNegativeWords.some(negativeWord => username.includes(negativeWord))) throw new ForbiddenException("Your username contains bad words");
 
         // Create User
         const user = await this.userRepository.createUser(dto);
