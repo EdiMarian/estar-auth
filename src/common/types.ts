@@ -9,8 +9,11 @@ interface CosmosDocument {
 interface User extends CosmosDocument {
     id: string;
     username: string;
-    roles: Roles[];
     addressesIDs: string[];
+    vipID: string;
+    roles: Role[];
+    subscriptionID: string | null;
+    activityPaymentsIDs: string[];
 }
 
 interface UserAddress extends CosmosDocument {
@@ -20,16 +23,38 @@ interface UserAddress extends CosmosDocument {
     address: string;
 }
 
+interface UserVips extends CosmosDocument {
+    id: string;
+    userId: string;
+    name: string;
+    xp: number;
+}
+
+interface UserSubscriptions extends CosmosDocument {
+    id: string;
+    userId: string;
+    method: PaymentMethod;
+    period: number;
+}
+
 interface Token {
     token: string;
 }
 
 // Enums
-enum Roles {
+enum Role {
     MEMBER = "member",
     ANALITYCS = "analitycs",
     MODORATOR = "moderator",
     ADMIN = "admin",
+}
+
+enum PaymentMethod {
+    ESTAR = "estar",
+    EGLD = "egld",
+    BNB = "bnb",
+    FIAT = "fiat",
+    SHARDS = "shards",
 }
 
 export {
@@ -37,5 +62,7 @@ export {
     User,
     UserAddress,
     Token,
-    Roles,
+    Role,
+    UserSubscriptions,
+    UserVips
 }
