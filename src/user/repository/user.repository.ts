@@ -75,7 +75,7 @@ export class UserRepository {
         const user: User = {
             id: userId,
             username,
-            role: [Roles.MEMBER],
+            roles: [Roles.MEMBER],
             addressesIDs: [userAddress.id],
         }
 

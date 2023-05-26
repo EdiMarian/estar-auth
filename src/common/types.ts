@@ -9,7 +9,7 @@ interface CosmosDocument {
 interface User extends CosmosDocument {
     id: string;
     username: string;
-    role: Roles[];
+    roles: Roles[];
     addressesIDs: string[];
 }
 
