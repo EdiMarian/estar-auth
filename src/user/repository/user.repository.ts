@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CosmosService } from '../../cosmos/cosmos.service';
-import { Role, User, UserAddress, UserVips } from 'src/common/types';
+import { FindUserArgs, Role, User, UserAddress, UserVips } from 'src/common/types';
 import { RegisterDto } from 'src/auth/dto';
 import * as uuid4 from 'uuid4';
 import { cleanDocument } from 'src/common/functions';
@@ -15,8 +15,25 @@ export class UserRepository {
         return resources;
     }
 
-    async findOne(id: string): Promise<User> {
+    async findOne(id: string, args: { withAddresses?: boolean, withVip?: boolean, withSubscription?: boolean, withActivityPayments?: boolean }): Promise<User> {
         const { resource } = await this.cosmosService.users().item(id, id).read<User>();
+        if (args.withAddresses) {
+            const addresses = await this.findUserAddresses(id);
+            resource.addresses = addresses;
+        }
+        if (args.withVip) {
+            const vip = await this.findUserVips(resource.vipID, id);
+            resource.vip = vip;
+        }
+        if (args.withSubscription) {
+            const subscription = await this.findUserSubscription(resource.subscriptionID, id);
+            resource.subscription = subscription;
+        }
+        if (args.withActivityPayments) {
+            const activityPayments = await this.findUserActivityPayments(id);
+            resource.activityPayments = activityPayments;
+        }
+        
         return resource;
     }
 
@@ -67,9 +84,17 @@ export class UserRepository {
         return resources;
     }
 
-    async findUserVips(vipId: string, userId: string) {
+    async findUserVips(vipId: string, userId: string): Promise<UserVips> {
         const { resource } = await this.cosmosService.userVips().item(vipId, userId).read<UserVips>();
         return resource;
+    }
+
+    async findUserSubscription(subscriptionId: string, userId: string) {
+        return null;
+    }
+
+    async findUserActivityPayments(userId: string) {
+        return [null];
     }
 
     async createUser(dto: RegisterDto) {
@@ -115,7 +140,7 @@ export class UserRepository {
         return resource;
     }
 
-    async insertUserAddress(userId: string, dto: LinkAddressDto): Promise<User & { addresses: UserAddress[], vip: UserVips}> {
+    async insertUserAddress(userId: string, dto: LinkAddressDto): Promise<User> {
         // Desctructure the dto
         const { chain, address } = dto;
 
@@ -123,20 +148,15 @@ export class UserRepository {
         const userAddress = await this.creatUserAddress(userId, chain, address);
 
         // Get the user
-        const user = await this.findOne(userId);
+        const user = await this.findOne(userId, { withAddresses: true, withVip: true });
 
         // Add the address to the user
         user.addressesIDs.push(userAddress.id);
 
         // Update the user
         const { resource } = await this.cosmosService.users().item(userId, userId).replace<User>(user);
-        const userAddresses = await this.findUserAddresses(userId);
         return {
-            ...cleanDocument<User>(resource, 'addresses', true),
-            addresses: [
-                ...userAddresses.map((userAddress: UserAddress) => cleanDocument<UserAddress>(userAddress, 'user'))
-            ],
-            vip: cleanDocument<UserVips>(await this.findUserVips(user.vipID, user.id)),
+            ...cleanDocument<User>(resource, '', true),
         }
     }
 }

@@ -26,7 +26,7 @@ export class UserService {
         }
 
         // User Validation
-        const userFound = await this.userRepository.findOne(id);
+        const userFound = await this.userRepository.findOne(id, { });
         if(!userFound) {
             throw new ForbiddenException("User not found");
         }

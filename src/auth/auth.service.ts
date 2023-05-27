@@ -74,7 +74,7 @@ export class AuthService {
         }
 
         // Get User
-        const user = await this.userRepository.findOne(addressesFound[0].userId);
+        const user = await this.userRepository.findOne(addressesFound[0].userId, {});
 
         // Validate User
         if(!user) {

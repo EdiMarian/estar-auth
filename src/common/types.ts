@@ -10,10 +10,14 @@ interface User extends CosmosDocument {
     id: string;
     username: string;
     addressesIDs: string[];
+    addresses?: UserAddress[];
     vipID: string;
+    vip?: UserVips;
     roles: Role[];
     subscriptionID: string | null;
+    subscription?: UserSubscriptions;
     activityPaymentsIDs: string[];
+    activityPayments?: any[];
 }
 
 interface UserAddress extends CosmosDocument {
@@ -41,6 +45,13 @@ interface Token {
     token: string;
 }
 
+interface FindUserArgs {
+    withAddresses?: boolean;
+    withVip?: boolean;
+    withSubscription?: boolean;
+    withActivityPayments?: boolean;
+}
+
 // Enums
 enum Role {
     MEMBER = "member",
@@ -62,6 +73,7 @@ export {
     User,
     UserAddress,
     Token,
+    FindUserArgs,
     Role,
     UserSubscriptions,
     UserVips

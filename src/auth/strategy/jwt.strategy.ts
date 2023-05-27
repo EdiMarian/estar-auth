@@ -15,22 +15,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         })
     }
     
-    async validate(payload: any): Promise<User & {vip: UserVips}> {
-        const user = await this.userRepository.findOne(payload.sub);
+    async validate(payload: any): Promise<User> {
+        const user = await this.userRepository.findOne(payload.sub, { withAddresses: true, withVip: true });
         if(!user) {
             return null;
         }
-        const userAddresses = await this.userRepository.findUserAddresses(user.id);
         const userReturned = {
-            ...cleanDocument<User>(user, 'addresses', true),
+            ...cleanDocument<User>(user,'', true),
             connected: {
                 chain: payload.chain,
                 address: payload.address
             },
-            addresses: [
-                ...userAddresses.map((userAddress: UserAddress) => cleanDocument<UserAddress>(userAddress, 'user'))
-            ],
-            vip: cleanDocument<UserVips>(await this.userRepository.findUserVips(user.vipID, user.id))
         }
         return userReturned;
     }
