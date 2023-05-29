@@ -41,6 +41,16 @@ interface UserSubscriptions extends CosmosDocument {
     period: number;
 }
 
+interface ShopItem extends CosmosDocument {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    image: string;
+    type: ItemType;
+    period: number;
+}
+
 interface Token {
     token: string;
 }
@@ -68,6 +78,11 @@ enum PaymentMethod {
     SHARDS = "shards",
 }
 
+enum ItemType {
+    ONE_TIME = "one_time",
+    SUBSCRIPTION = "subscription",
+}
+
 export {
     CosmosDocument,
     User,
@@ -76,5 +91,7 @@ export {
     FindUserArgs,
     Role,
     UserSubscriptions,
-    UserVips
+    UserVips,
+    ShopItem,
+    ItemType
 }
