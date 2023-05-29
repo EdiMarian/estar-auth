@@ -1,8 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AdminStrategy } from './strategy';
+import { UserModule } from 'src/user/user.module';
 
+@Global()
 @Module({
-  providers: [AdminService, AdminStrategy]
+  imports: [UserModule],
+  providers: [AdminService, AdminStrategy],
+  exports: [AdminStrategy]
 })
 export class AdminModule {}
