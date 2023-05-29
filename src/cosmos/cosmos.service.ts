@@ -24,4 +24,8 @@ export class CosmosService {
     userVips(): Container {
         return this.database.container('uservips');
     }
+
+    userSubscriptions(): Container {
+        return this.database.container('usersubscriptions');
+    }
 }
