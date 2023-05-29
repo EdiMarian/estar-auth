@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
+import { CosmosService } from '../../cosmos/cosmos.service';
 
 @Injectable()
 export class ShopRepository {
-    constructor() {}
+    constructor(private readonly cosmosService: CosmosService) {}
 }

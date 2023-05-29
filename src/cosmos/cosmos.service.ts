@@ -28,4 +28,8 @@ export class CosmosService {
     userSubscriptions(): Container {
         return this.database.container('usersubscriptions');
     }
+
+    shop(): Container {
+        return this.database.container('shopitems');
+    }
 }
