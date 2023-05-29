@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { UserRepository } from '../../user/repository/user.repository';
-import { User } from 'src/common/types';
+import { Role } from 'src/common/types';
 
 @Injectable()
 export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
@@ -14,9 +14,8 @@ export class AdminStrategy extends PassportStrategy(Strategy, 'admin') {
         })
     }
     
-    async validate(payload: any): Promise<User> {
+    async validate(payload: any): Promise<boolean> {
         const user = await this.userRepository.findOne(payload.sub, { });
-        console.log(user)
-        return user;
+        return user.roles.includes(Role.ADMIN);
     }
 }
