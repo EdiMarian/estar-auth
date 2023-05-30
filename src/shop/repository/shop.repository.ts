@@ -26,4 +26,9 @@ export class ShopRepository {
         
         return cleanDocument<ShopItem>(resource);
     }
+
+    async findAll(): Promise<ShopItem[]> {
+        const { resources } = await this.cosmosService.shop().items.readAll().fetchAll();
+        return resources.map((resource: ShopItem) => cleanDocument<ShopItem>(resource));
+    }
 }
