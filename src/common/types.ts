@@ -45,7 +45,9 @@ interface ShopItem extends CosmosDocument {
     id: string;
     name: string;
     description: string;
+    amount: number;
     price: number;
+    currency: string[];
     image: string;
     type: ItemType;
     period: number;
