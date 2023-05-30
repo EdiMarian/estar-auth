@@ -5,8 +5,9 @@ import { UserModule } from './user/user.module';
 import { CosmosModule } from './cosmos/cosmos.module';
 import { ShopModule } from './shop/shop.module';
 import { AdminModule } from './admin/admin.module';
+import { StripeModule } from './stripe/stripe.module';
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, CosmosModule, ShopModule, AdminModule],
+  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, CosmosModule, ShopModule, AdminModule, StripeModule],
   controllers: [],
   providers: [],
 })
