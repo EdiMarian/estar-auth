@@ -82,7 +82,7 @@ enum PaymentMethod {
 }
 
 enum ItemType {
-    ONE_TIME = "one_time",
+    PAYMENT = "payment",
     SUBSCRIPTION = "subscription",
 }
 
