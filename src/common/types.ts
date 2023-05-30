@@ -43,6 +43,7 @@ interface UserSubscriptions extends CosmosDocument {
 
 interface ShopItem extends CosmosDocument {
     id: string;
+    stripe_price_id: string;
     name: string;
     description: string;
     amount: number;

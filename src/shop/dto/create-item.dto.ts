@@ -11,6 +11,10 @@ export class CreateItemDto {
     @IsNotEmpty()
     description: string;
 
+    @IsString()
+    @IsNotEmpty()
+    stripe_price_id: string;
+
     @IsNumber()
     @IsNotEmpty()
     amount: number;

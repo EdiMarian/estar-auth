@@ -28,7 +28,7 @@ export class ShopService {
             mode: 'payment',
             line_items: [
                 {
-                    price: 'price_1NDN10FyEBTH50dgrEA6r9ca',
+                    price: item.stripe_price_id,
                     quantity: 1,
                 }
             ],
