@@ -54,6 +54,15 @@ interface ShopItem extends CosmosDocument {
     period: number;
 }
 
+interface Order extends CosmosDocument {
+    id: string;
+    userId: string;
+    itemId: string;
+    method: PaymentMethod;
+    createdAt: Date;
+    status: OrderStatus
+}
+
 interface Token {
     token: string;
 }
@@ -86,6 +95,12 @@ enum ItemType {
     SUBSCRIPTION = "subscription",
 }
 
+enum OrderStatus {
+    PENDING = "pending",
+    COMPLETED = "completed",
+    CANCELLED = "cancelled",
+}
+
 export {
     CosmosDocument,
     User,
@@ -96,5 +111,8 @@ export {
     UserSubscriptions,
     UserVips,
     ShopItem,
-    ItemType
+    PaymentMethod,
+    ItemType,
+    Order,
+    OrderStatus,
 }
