@@ -6,6 +6,7 @@ import { OrderStatus, PaymentMethod } from 'src/common/types';
 import { CreateOrderDto } from 'src/order/dto';
 import { ShopRepository } from '../shop/repository/shop.repository';
 import { UserRepository } from '../user/repository/user.repository';
+import * as uuid4 from 'uuid4';
 
 @Injectable()
 export class StripeService {
@@ -40,7 +41,7 @@ export class StripeService {
             // update user
             switch (item.name) {
                 case 'subscription':
-                    // add subscription to user
+                    await this.updateUserSubscription(metadata.userId, item.period);
                     break;
                 case 'diamonds':
                     await this.updateUserDiamonds(metadata.userId, item.amount);
@@ -50,6 +51,21 @@ export class StripeService {
                     break;
             }
         }
+    }
+
+    async createOrder(userId: string, itemId: string, status: OrderStatus) {
+        // create order
+        const orderDto: CreateOrderDto = {
+            itemId: itemId,
+            userId: userId,
+            method: PaymentMethod.FIAT,
+            createdAt: new Date(),
+            status: status,
+        }
+
+        // save order
+        const order = await this.orderRepository.createOrder(orderDto);
+        this.logger.log(`Order created: ${order.id}`);
     }
 
     async updateUserDiamonds(userId: string, amount: number) {
@@ -67,18 +83,47 @@ export class StripeService {
         this.logger.log(`User ${userId} updated with ${amount} diamonds`);
     }
 
-    async createOrder(userId: string, itemId: string, status: OrderStatus) {
-        // create order
-        const orderDto: CreateOrderDto = {
-            itemId: itemId,
-            userId: userId,
-            method: PaymentMethod.FIAT,
-            createdAt: new Date(),
-            status: status,
+    async updateUserSubscription(userId: string, period: number) {
+        // check if user exists
+        const user = await this.userRepository.findOne(userId, { withSubscription: true});
+        if (!user) {
+            this.logger.error(`User ${userId} not found`);
+            return;
         }
 
-        // save order
-        const order = await this.orderRepository.createOrder(orderDto);
-        this.logger.log(`Order created: ${order.id}`);
+        // check if user has subscription
+        if (user.subscription) {
+            // get current expiration date
+            const expiresAt = new Date(user.subscription.expiresAt);
+            expiresAt.setDate(expiresAt.getDate() + period);
+
+            // update subscription
+            user.subscription.expiresAt = expiresAt;
+            await this.userRepository.updateUserSubscription(userId, user.subscription);
+
+            this.logger.log(`User ${userId} updated with subscription for ${period} days`);
+        } else {
+            // create subscription
+            user.subscription = {
+                id: uuid4(),
+                userId: userId,
+                method: PaymentMethod.FIAT,
+                createdAt: new Date(),
+                expiresAt: new Date(),
+            }
+            user.subscription.expiresAt.setDate(user.subscription.expiresAt.getDate() + period);
+
+            // save subscription
+            await this.userRepository.creatUserSubscription(user.subscription);
+
+            // update user
+            user.subscriptionID = user.subscription.id;
+
+            // delete subscription from user and save
+            delete user.subscription
+            await this.userRepository.updateUser(user);
+
+            this.logger.log(`User ${userId} created with subscription for ${period} days`);
+        }
     }
 }

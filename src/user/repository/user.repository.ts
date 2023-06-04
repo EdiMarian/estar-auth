@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CosmosService } from '../../cosmos/cosmos.service';
-import { FindUserArgs, Role, User, UserAddress, UserVips } from 'src/common/types';
+import { FindUserArgs, Role, User, UserAddress, UserSubscriptions, UserVips } from 'src/common/types';
 import { RegisterDto } from 'src/auth/dto';
 import * as uuid4 from 'uuid4';
 import { cleanDocument } from 'src/common/functions';
-import { LinkAddressDto } from '../dto';
+import { CreateUserSubscriptionDto, LinkAddressDto } from '../dto';
 
 @Injectable()
 export class UserRepository {
@@ -26,8 +26,12 @@ export class UserRepository {
             resource.vip = vip;
         }
         if (args.withSubscription) {
-            const subscription = await this.findUserSubscription(resource.subscriptionID, id);
-            resource.subscription = subscription;
+            if(!resource.subscriptionID) {
+                resource.subscription = null
+            } else {
+                const subscription = await this.findUserSubscription(resource.subscriptionID, id);
+                resource.subscription = subscription;
+            }
         }
         if (args.withActivityPayments) {
             const activityPayments = await this.findUserActivityPayments(id);
@@ -89,8 +93,9 @@ export class UserRepository {
         return resource;
     }
 
-    async findUserSubscription(subscriptionId: string, userId: string) {
-        return null;
+    async findUserSubscription(subscriptionId: string, userId: string): Promise<UserSubscriptions> {
+        const { resource } = await this.cosmosService.userSubscriptions().item(subscriptionId, userId).read<UserSubscriptions>();
+        return resource;
     }
 
     async findUserActivityPayments(userId: string) {
@@ -141,6 +146,11 @@ export class UserRepository {
         return resource;
     }
 
+    async creatUserSubscription(dto: CreateUserSubscriptionDto): Promise<UserSubscriptions> {
+        const { resource } = await this.cosmosService.userSubscriptions().items.create<UserSubscriptions>(dto);
+        return resource;
+    }
+
     async insertUserAddress(userId: string, dto: LinkAddressDto): Promise<User> {
         // Desctructure the dto
         const { chain, address } = dto;
@@ -166,5 +176,10 @@ export class UserRepository {
         return {
             ...cleanDocument<User>(resource, '', true),
         }
+    }
+
+    async updateUserSubscription(userId: string, subscription: UserSubscriptions): Promise<UserSubscriptions> {
+        const { resource } = await this.cosmosService.userSubscriptions().item(subscription.id, userId).replace<UserSubscriptions>(subscription);
+        return resource;
     }
 }

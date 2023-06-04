@@ -39,7 +39,8 @@ interface UserSubscriptions extends CosmosDocument {
     id: string;
     userId: string;
     method: PaymentMethod;
-    period: number;
+    createdAt: Date;
+    expiresAt: Date;
 }
 
 interface ShopItem extends CosmosDocument {
