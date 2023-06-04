@@ -1,7 +1,7 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { ShopRepository } from './repository/shop.repository';
 import { CreateItemDto } from './dto';
-import { PaymentMethod, ShopItem } from 'src/common/types';
+import { OrderStatus, PaymentMethod, ShopItem } from 'src/common/types';
 import { StripeService } from '../stripe/stripe.service';
 import { CreateOrderDto } from 'src/order/dto';
 
@@ -47,7 +47,7 @@ export class ShopService {
             userId: userId,
             method: PaymentMethod.FIAT,
             createdAt: new Date(),
-            status: 'pending',
+            status: OrderStatus.PENDING,
         }
 
         return session.url;
