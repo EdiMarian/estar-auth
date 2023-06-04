@@ -160,4 +160,11 @@ export class UserRepository {
             ...cleanDocument<User>(resource, '', true),
         }
     }
+
+    async updateUser(user: User): Promise<User> {
+        const { resource } = await this.cosmosService.users().item(user.id, user.id).replace<User>(user);
+        return {
+            ...cleanDocument<User>(resource, '', true),
+        }
+    }
 }

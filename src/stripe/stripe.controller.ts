@@ -19,10 +19,6 @@ export class StripeController {
             sig,
             endpointSecret,
         );
-        if (event.type === 'checkout.session.completed') {
-            const session: any = event.data?.object;
-            const metadata = session.metadata;
-            await this.stripeService.createAnOrderAndSaveItemToUser(metadata.userId, metadata.itemId, OrderStatus.COMPLETED);
-        }
+        await this.stripeService.webhook(event);
     }
 }
