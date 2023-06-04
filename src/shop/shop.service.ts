@@ -28,11 +28,11 @@ export class ShopService {
 
         // create stripe session
         const session = await this.stripeService.stripe.checkout.sessions.create({
-            mode: item.type,
+            mode: item.paymentType,
             line_items: [
                 {
                     price: item.stripe_price_id,
-                    quantity: 1,
+                    quantity: item.amount,
                 }
             ],
             success_url: 'http://localhost:3000/shop?success=true',

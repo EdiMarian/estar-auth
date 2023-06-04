@@ -1,11 +1,15 @@
 import { IsArray, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { ItemType } from "src/common/types";
+import { ItemType, PaymentType } from "src/common/types";
 
 export class CreateItemDto {
 
     @IsString()
     @IsNotEmpty()
     name: string;
+
+    @IsString()
+    @IsNotEmpty()
+    type: ItemType;
 
     @IsString()
     @IsNotEmpty()
@@ -33,7 +37,7 @@ export class CreateItemDto {
 
     @IsString()
     @IsNotEmpty()
-    type: ItemType;
+    paymentType: PaymentType;
 
     @IsNumber()
     @IsNotEmpty()

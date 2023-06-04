@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { OrderRepository } from '../order/repository/order.repository';
-import { OrderStatus, PaymentMethod } from 'src/common/types';
+import { ItemType, OrderStatus, PaymentMethod } from 'src/common/types';
 import { CreateOrderDto } from 'src/order/dto';
 import { ShopRepository } from '../shop/repository/shop.repository';
 import { UserRepository } from '../user/repository/user.repository';
@@ -39,11 +39,11 @@ export class StripeService {
             }
 
             // update user
-            switch (item.name) {
-                case 'subscription':
+            switch (item.type) {
+                case ItemType.SUBSCRIPTION:
                     await this.updateUserSubscription(metadata.userId, item.period);
                     break;
-                case 'diamonds':
+                case ItemType.DIAMONDS:
                     await this.updateUserDiamonds(metadata.userId, item.amount);
                     break;
                 default:    

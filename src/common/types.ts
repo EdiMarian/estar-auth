@@ -47,12 +47,13 @@ interface ShopItem extends CosmosDocument {
     id: string;
     stripe_price_id: string;
     name: string;
+    type: ItemType;
     description: string;
     amount: number;
     price: number;
     currency: string[];
     image: string;
-    type: ItemType;
+    paymentType: PaymentType;
     period: number;
 }
 
@@ -92,9 +93,15 @@ enum PaymentMethod {
     SHARDS = "shards",
 }
 
-enum ItemType {
+enum PaymentType {
     PAYMENT = "payment",
     SUBSCRIPTION = "subscription",
+}
+
+enum ItemType {
+    DIAMONDS = "diamonds",
+    SUBSCRIPTION = "subscription",
+    ITEMS = "items",
 }
 
 enum OrderStatus {
@@ -114,6 +121,7 @@ export {
     UserVips,
     ShopItem,
     PaymentMethod,
+    PaymentType,
     ItemType,
     Order,
     OrderStatus,
