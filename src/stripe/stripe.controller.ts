@@ -1,8 +1,8 @@
 import { Body, Controller, Post, Req, RawBodyRequest } from '@nestjs/common';
 import { StripeService } from './stripe.service';
-import { buffer } from 'micro';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { OrderStatus } from 'src/common/types';
 
 @Controller('stripe')
 export class StripeController {
@@ -22,7 +22,7 @@ export class StripeController {
         if (event.type === 'checkout.session.completed') {
             const session: any = event.data?.object;
             const metadata = session.metadata;
-            console.log(metadata);
+            await this.stripeService.createAnOrder(metadata.userId, metadata.itemId, OrderStatus.COMPLETED);
         }
     }
 }

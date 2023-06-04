@@ -1,13 +1,15 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { ShopRepository } from './repository/shop.repository';
 import { CreateItemDto } from './dto';
-import { OrderStatus, PaymentMethod, ShopItem } from 'src/common/types';
+import { ShopItem } from 'src/common/types';
 import { StripeService } from '../stripe/stripe.service';
-import { CreateOrderDto } from 'src/order/dto';
 
 @Injectable()
 export class ShopService {
-    constructor(private readonly shopRepository: ShopRepository, private readonly stripeService: StripeService) {}
+    constructor(
+        private readonly shopRepository: ShopRepository,
+        private readonly stripeService: StripeService
+    ) {}
 
     async createItem(createItemDto: CreateItemDto) {
         return this.shopRepository.createItem(createItemDto);
@@ -36,19 +38,10 @@ export class ShopService {
             success_url: 'http://localhost:3000/shop?success=true',
             cancel_url: 'http://localhost:3000/shop?cancelled=true',
             metadata: {
-                item_id: item.id,
-                user_id: userId,
+                userId: userId,
+                itemId: item.id
             }
         });
-
-        // create order
-        const orderDto: CreateOrderDto = {
-            itemId: item.id,
-            userId: userId,
-            method: PaymentMethod.FIAT,
-            createdAt: new Date(),
-            status: OrderStatus.PENDING,
-        }
 
         return session.url;
     }
