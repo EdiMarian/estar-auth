@@ -25,7 +25,7 @@ export class ShopService {
 
         // create stripe session
         const session = await this.stripeService.stripe.checkout.sessions.create({
-            mode: 'payment',
+            mode: item.type,
             line_items: [
                 {
                     price: item.stripe_price_id,

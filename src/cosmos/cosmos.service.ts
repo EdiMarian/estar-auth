@@ -32,4 +32,8 @@ export class CosmosService {
     shop(): Container {
         return this.database.container('shopitems');
     }
+
+    orders(): Container {
+        return this.database.container('orders');
+    }
 }
