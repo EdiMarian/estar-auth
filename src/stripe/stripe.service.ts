@@ -15,7 +15,7 @@ export class StripeService {
         });
     }
 
-    async createAnOrder(userId: string, itemId: string, status: OrderStatus) {
+    async createAnOrderAndSaveItemToUser(userId: string, itemId: string, status: OrderStatus) {
         // create order
         const orderDto: CreateOrderDto = {
             itemId: itemId,

@@ -9,6 +9,7 @@ interface CosmosDocument {
 interface User extends CosmosDocument {
     id: string;
     username: string;
+    diamonds: number;
     addressesIDs: string[];
     addresses?: UserAddress[];
     vipID: string;
