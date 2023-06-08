@@ -51,6 +51,7 @@ interface ShopItem extends CosmosDocument {
     description: string;
     amount: number;
     price: number;
+    givenXP: number;
     currency: string[];
     image: string;
     paymentType: PaymentType;

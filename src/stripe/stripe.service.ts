@@ -50,6 +50,9 @@ export class StripeService {
                     this.logger.error(`For item ${item.name} no action is defined`);
                     break;
             }
+
+            // update user vip xp
+            await this.userRepository.gainUserVipXp(metadata.userId, item.givenXP);
         }
     }
 

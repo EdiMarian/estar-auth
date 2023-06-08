@@ -27,6 +27,10 @@ export class CreateItemDto {
     @IsNotEmpty()
     price: number;
 
+    @IsNumber()
+    @IsNotEmpty()
+    givenXP: number;
+
     @IsArray()
     @IsNotEmpty()
     currency: string[];

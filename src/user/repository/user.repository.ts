@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CosmosService } from '../../cosmos/cosmos.service';
 import { FindUserArgs, Role, User, UserAddress, UserSubscriptions, UserVips } from 'src/common/types';
 import { RegisterDto } from 'src/auth/dto';
 import * as uuid4 from 'uuid4';
 import { cleanDocument } from 'src/common/functions';
 import { CreateUserSubscriptionDto, LinkAddressDto } from '../dto';
+import { levels } from 'src/common/constants';
 
 @Injectable()
 export class UserRepository {
+    private readonly logger = new Logger(UserRepository.name);
     constructor(private readonly cosmosService: CosmosService) {}
 
     async findAll(): Promise<User[]> {
@@ -180,6 +182,18 @@ export class UserRepository {
 
     async updateUserSubscription(userId: string, subscription: UserSubscriptions): Promise<UserSubscriptions> {
         const { resource } = await this.cosmosService.userSubscriptions().item(subscription.id, userId).replace<UserSubscriptions>(subscription);
+        return resource;
+    }
+
+    async gainUserVipXp(userId: string, xp: number): Promise<UserVips> {
+        const user = await this.findOne(userId, { withAddresses: false, withVip: true });
+        const vip = user.vip;
+        vip.xp += xp;
+        while(vip.level < levels.length && vip.xp >= levels[vip.level - 1].requiredXP) {
+            vip.level++;
+            this.logger.log(`User ${userId} leveled up to ${vip.level}`);
+        }
+        const { resource } = await this.cosmosService.userVips().item(vip.id, userId).replace<UserVips>(vip);
         return resource;
     }
 }

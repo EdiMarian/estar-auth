@@ -10,7 +10,7 @@ export class ShopRepository {
 
     async createItem(createItemDto: CreateItemDto): Promise<ShopItem> {
         // Destructure the DTO
-        const { name, type, description, stripe_price_id, amount, price, currency, image, paymentType, period } = createItemDto;
+        const { name, type, description, stripe_price_id, amount, price, givenXP, currency, image, paymentType, period } = createItemDto;
 
         // Create the item
         const { resource } = await this.cosmosService.shop().items.create({
@@ -20,6 +20,7 @@ export class ShopRepository {
             stripe_price_id,
             amount,
             price,
+            givenXP,
             currency,
             image,
             paymentType,
