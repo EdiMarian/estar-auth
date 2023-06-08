@@ -140,7 +140,7 @@ export class UserRepository {
         const { resource } = await this.cosmosService.userVips().items.create<UserVips>({
             id: uuid4(),
             userId,
-            name: 'VIP1',
+            level: 1,
             xp: 0,
         });
         return resource;

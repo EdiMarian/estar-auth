@@ -31,7 +31,7 @@ interface UserAddress extends CosmosDocument {
 interface UserVips extends CosmosDocument {
     id: string;
     userId: string;
-    name: string;
+    level: number;
     xp: number;
 }
 
