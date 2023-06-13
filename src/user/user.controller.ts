@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Get, Body, Patch } from '@nestjs/common';
+import { Controller, UseGuards, Get, Body, Patch, Param } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from './decorator';
 import { UserService } from './user.service';
@@ -18,6 +18,11 @@ export class UserController {
     @Get('/me/tokens')
     getUserTokens(@GetUser('addresses') addresses: UserAddress[]): Promise<UserTokens[]> {
         return this.userService.getUserTokens(addresses);
+    }
+
+    @Get('/me/nfts')
+    getUserNfts(@GetUser('addresses') addresses: UserAddress[], @Param('collection') collection?: string): Promise<any[]> {
+        return this.userService.getUserNfts(addresses, collection);
     }
 
     @Get('/')

@@ -5,9 +5,10 @@ import { User, UserAddress, UserTokens } from 'src/common/types';
 import { ItemDefinition } from '@azure/cosmos';
 import { LinkAddressDto } from './dto';
 import { AuthService } from '../auth/auth.service';
-import { includeAnChain } from 'src/common/functions';
+import { getChainAddress } from 'src/common/functions';
 import { ConfigService } from '@nestjs/config';
 import { tokens } from 'src/common/constants/tokens';
+import { collections } from 'src/common/constants';
 
 @Injectable()
 export class UserService {
@@ -29,17 +30,36 @@ export class UserService {
         return this.userRepository.findAll();
     }
 
+    // TODO: Refactor this
     async getUserTokens(addresses: UserAddress[]): Promise<UserTokens[]> {
-        if(includeAnChain(addresses, 'multiversx')) {
+        const chainAddress = getChainAddress(addresses, 'multiversx');
+        if(chainAddress) {
             const params = new URLSearchParams();
             params.append('identifiers', tokens.map((token) => token).join(','));
-            const tokensFound = await this.apiProvider.doGetGeneric(`accounts/${addresses[0].address}/tokens?${params.toString()}`);
+            const tokensFound = await this.apiProvider.doGetGeneric(`accounts/${chainAddress.address}/tokens?${params.toString()}`);
             return tokensFound.map((token) => {
                 return {
                     identifier: token.identifier,
                     balance: token.balance / 10 ** token.decimals,
                 }
             });
+        }
+        return [];
+    }
+
+    // TODO: Refactor this
+    async getUserNfts(addresses: UserAddress[], collection?: string): Promise<any[]> {
+        const chainAddress = getChainAddress(addresses, 'multiversx');
+        if(chainAddress) {
+            const params = new URLSearchParams();
+            if(collection) {
+                params.append('collection', collection);
+            } else {
+                params.append('collections', collections.map((collection) => collection).join(','));
+            }
+            params.append('size', '10000');
+            const nftsFound = await this.apiProvider.doGetGeneric(`accounts/${chainAddress.address}/nfts?${params.toString()}`);
+            return nftsFound;
         }
         return
     }
