@@ -71,6 +71,11 @@ interface Token {
     token: string;
 }
 
+interface UserTokens {
+    identifier: string;
+    balance: number;
+}
+
 interface FindUserArgs {
     withAddresses?: boolean;
     withVip?: boolean;
@@ -116,6 +121,7 @@ export {
     User,
     UserAddress,
     Token,
+    UserTokens,
     FindUserArgs,
     Role,
     UserSubscriptions,

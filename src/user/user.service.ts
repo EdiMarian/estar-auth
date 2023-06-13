@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ApiNetworkProvider } from '@multiversx/sdk-network-providers/out';
 import { UserRepository } from './repository/user.repository';
-import { User, UserAddress } from 'src/common/types';
+import { User, UserAddress, UserTokens } from 'src/common/types';
 import { ItemDefinition } from '@azure/cosmos';
 import { LinkAddressDto } from './dto';
 import { AuthService } from '../auth/auth.service';
@@ -29,7 +29,7 @@ export class UserService {
         return this.userRepository.findAll();
     }
 
-    async getUserTokens(addresses: UserAddress[]): Promise<any> {
+    async getUserTokens(addresses: UserAddress[]): Promise<UserTokens[]> {
         if(includeAnChain(addresses, 'multiversx')) {
             const params = new URLSearchParams();
             params.append('identifiers', tokens.map((token) => token).join(','));
