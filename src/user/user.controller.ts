@@ -2,7 +2,7 @@ import { Controller, UseGuards, Get, Body, Patch } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from './decorator';
 import { UserService } from './user.service';
-import { User } from 'src/common/types';
+import { User, UserAddress } from 'src/common/types';
 import { LinkAddressDto } from './dto';
 
 @UseGuards(JwtGuard)
@@ -13,6 +13,11 @@ export class UserController {
     @Get('/me')
     getUser(@GetUser() user: User): User {
         return user;
+    }
+
+    @Get('/me/tokens')
+    getUserTokens(@GetUser('addresses') addresses: UserAddress[]) {
+        return this.userService.getUserTokens(addresses);
     }
 
     @Get('/')
