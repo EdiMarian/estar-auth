@@ -19,6 +19,7 @@ interface User extends CosmosDocument {
     subscription?: UserSubscriptions;
     activityPaymentsIDs: string[];
     activityPayments?: any[];
+    connected?: UserConnected
 }
 
 interface UserAddress extends CosmosDocument {
@@ -41,6 +42,11 @@ interface UserSubscriptions extends CosmosDocument {
     method: PaymentMethod;
     createdAt: Date;
     expiresAt: Date;
+}
+
+interface UserConnected {
+    chain: string;
+    address: string;
 }
 
 interface ShopItem extends CosmosDocument {
@@ -126,6 +132,7 @@ export {
     Role,
     UserSubscriptions,
     UserVips,
+    UserConnected,
     ShopItem,
     PaymentMethod,
     PaymentType,

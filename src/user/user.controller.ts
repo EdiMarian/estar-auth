@@ -15,6 +15,11 @@ export class UserController {
         return user;
     }
 
+    @Get('/me/profile-image')
+    getUserProfileImage(@GetUser() user: User) {
+        return this.userService.getUserProfileImage(user.connected);
+    }
+
     @Get('/me/tokens')
     getUserTokens(@GetUser('addresses') addresses: UserAddress[]): Promise<UserTokens[]> {
         return this.userService.getUserTokens(addresses);

@@ -1,11 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ApiNetworkProvider } from '@multiversx/sdk-network-providers/out';
 import { UserRepository } from './repository/user.repository';
-import { User, UserAddress, UserTokens } from 'src/common/types';
+import { User, UserAddress, UserConnected, UserTokens } from 'src/common/types';
 import { ItemDefinition } from '@azure/cosmos';
 import { LinkAddressDto } from './dto';
 import { AuthService } from '../auth/auth.service';
-import { getChainAddress } from 'src/common/functions';
+import { getChainAddress, getXPortalProfileImage } from 'src/common/functions';
 import { ConfigService } from '@nestjs/config';
 import { tokens } from 'src/common/constants/tokens';
 import { collections } from 'src/common/constants';
@@ -30,7 +30,18 @@ export class UserService {
         return this.userRepository.findAll();
     }
 
-    // TODO: Refactor this
+    async getUserProfileImage(connected: UserConnected): Promise<string> {
+        const { chain, address } = connected;
+        if(!address) throw new ForbiddenException("Address not provided");
+        if(!chain) throw new ForbiddenException("Chain not provided");
+
+        if(chain === this.authService.getChains()[0]) {
+            return `https://avatars.dicebear.com/api/avataaars/${address}.svg`;
+        }
+        const image = getXPortalProfileImage(address);
+        return image;
+    }
+
     async getUserTokens(addresses: UserAddress[]): Promise<UserTokens[]> {
         const chainAddress = getChainAddress(addresses, 'multiversx');
         if(chainAddress) {
@@ -47,7 +58,6 @@ export class UserService {
         return [];
     }
 
-    // TODO: Refactor this
     async getUserNfts(addresses: UserAddress[], collection?: string): Promise<any[]> {
         const chainAddress = getChainAddress(addresses, 'multiversx');
         if(chainAddress) {
