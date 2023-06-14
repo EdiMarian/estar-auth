@@ -37,9 +37,10 @@ export class UserService {
 
         if(chain === this.authService.getChains()[0]) {
             return `https://avatars.dicebear.com/api/avataaars/${address}.svg`;
+        } else {
+            const image = getXPortalProfileImage(address);
+            return image;
         }
-        const image = getXPortalProfileImage(address);
-        return image;
     }
 
     async getUserTokens(addresses: UserAddress[]): Promise<UserTokens[]> {
