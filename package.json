@@ -25,6 +25,7 @@
     "@azure/cosmos": "^3.17.3",
     "@azure/functions": "^1.0.3",
     "@multiversx/sdk-core": "^11.5.0",
+    "@multiversx/sdk-nestjs-cache": "^1.2.3",
     "@multiversx/sdk-nestjs-common": "^1.2.2",
     "@multiversx/sdk-network-providers": "^1.4.0",
     "@nestjs/azure-func-http": "^0.9.0",

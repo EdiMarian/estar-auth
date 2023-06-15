@@ -196,4 +196,24 @@ export class UserRepository {
         const { resource } = await this.cosmosService.userVips().item(vip.id, userId).replace<UserVips>(vip);
         return resource;
     }
+
+    // Getters
+    async getUsernameByAddress(address: string) {
+        const query: string = 'SELECT * FROM c WHERE c.address = @address'
+        const { resources } = await this.cosmosService.userAddresses().items.query({
+            query: query,
+            parameters: [
+                {
+                    name: '@address',
+                    value: address
+                }
+            ]
+        }).fetchNext();
+        if (resources.length === 0) {
+            return null;
+        }
+        const userAddress = resources[0];
+        const user = await this.findOne(userAddress.userId, { withAddresses: false, withVip: false });
+        return user.username;
+    }
 }

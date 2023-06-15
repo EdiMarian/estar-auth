@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { getChainAddress } from 'src/common/functions';
 import { getAddressRevenue } from 'src/common/functions';
 import { revenue } from './revenue';
+import { UserRepository } from '../user/repository/user.repository';
 
 @Injectable()
 export class RevenueService {
+    constructor(private readonly userRepository: UserRepository) {}
+
     getUserRevenue(addresses: any) {
         const chainAddress = getChainAddress(addresses, 'multiversx')
         if(chainAddress) {
@@ -13,7 +16,7 @@ export class RevenueService {
         return [];
     }
 
-    getTopPlayersRevenue(last?: number) {
+    async getTopPlayersRevenue(last?: number) {
         let usersMap = new Map();
 
         revenue.forEach(obj => {
@@ -39,6 +42,12 @@ export class RevenueService {
 
         if (last) {
             allUsers = allUsers.slice(0, last);
+        }
+
+        // Update user with username
+        for(const user of allUsers) {
+            const username = await this.userRepository.getUsernameByAddress(user.address);
+            user.username = username;
         }
 
         return allUsers;
