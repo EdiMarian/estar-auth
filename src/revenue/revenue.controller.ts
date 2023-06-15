@@ -1,13 +1,12 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { JwtGuard } from 'src/auth/guard';
+import { Controller, Get, Param } from '@nestjs/common';;
 import { RevenueService } from './revenue.service';
 
 @Controller('revenue')
 export class RevenueController {
     constructor(private readonly revenueService: RevenueService) {}
-    @Get('/all')
-    @UseGuards(JwtGuard)
-    getAllRevenue() {
-        return 'All revenue';
+
+    @Get('/top')
+    getTopPlayersRevenue(@Param('last') last?: number) {
+        return this.revenueService.getTopPlayersRevenue(last);
     }
 }
