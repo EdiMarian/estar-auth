@@ -7,9 +7,10 @@ import { ShopModule } from './shop/shop.module';
 import { AdminModule } from './admin/admin.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrderModule } from './order/order.module';
+import { RevenueModule } from './revenue/revenue.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, CosmosModule, ShopModule, AdminModule, StripeModule, OrderModule],
+  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, CosmosModule, ShopModule, AdminModule, StripeModule, OrderModule, RevenueModule],
   controllers: [],
   providers: [],
 })

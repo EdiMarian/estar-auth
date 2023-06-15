@@ -4,11 +4,12 @@ import { GetUser } from './decorator';
 import { UserService } from './user.service';
 import { User, UserAddress, UserTokens } from 'src/common/types';
 import { LinkAddressDto } from './dto';
+import { RevenueService } from '../revenue/revenue.service';
 
 @UseGuards(JwtGuard)
 @Controller('users')
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(private userService: UserService, private readonly revenueService: RevenueService) {}
 
     @Get('/me')
     getUser(@GetUser() user: User): User {
@@ -28,6 +29,11 @@ export class UserController {
     @Get('/me/nfts')
     getUserNfts(@GetUser('addresses') addresses: UserAddress[], @Param('collection') collection?: string): Promise<any[]> {
         return this.userService.getUserNfts(addresses, collection);
+    }
+
+    @Get('/me/revenue')
+    getUserRevenue(@GetUser('addresses') addresses: UserAddress[]): any[] {
+        return this.revenueService.getUserRevenue(addresses);
     }
 
     @Get('/')
