@@ -1,8 +1,7 @@
-import { Body, Controller, Post, Req, RawBodyRequest } from '@nestjs/common';
+import { Controller, Post, Req, RawBodyRequest } from '@nestjs/common';
 import { StripeService } from './stripe.service';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { OrderStatus } from 'src/common/types';
 
 @Controller('stripe')
 export class StripeController {
