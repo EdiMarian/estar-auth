@@ -3,10 +3,12 @@ import { getChainAddress } from 'src/common/functions';
 import { getAddressRevenue } from 'src/common/functions';
 import { revenue } from './revenue';
 import { UserRepository } from '../user/repository/user.repository';
+import { CacheService } from '@multiversx/sdk-nestjs-cache';
+import { Constants } from '@multiversx/sdk-nestjs-common';
 
 @Injectable()
 export class RevenueService {
-    constructor(private readonly userRepository: UserRepository) {}
+    constructor(private readonly userRepository: UserRepository, private readonly cacheService: CacheService) {}
 
     getUserRevenue(addresses: any) {
         const chainAddress = getChainAddress(addresses, 'multiversx')
@@ -51,5 +53,20 @@ export class RevenueService {
         }
 
         return allUsers;
+    }
+
+    async cacheTopPlayersRevenue() {
+        const topPlayersRevenue = await this.getTopPlayersRevenue(9);
+        await this.cacheService.set('topPlayersRevenue', topPlayersRevenue, Constants.oneMonth());
+    }
+
+    async getTopPlayersRevenueFromCache() {
+        const topPlayersRevenue = await this.cacheService.get('topPlayersRevenue');
+        if(topPlayersRevenue) {
+            return topPlayersRevenue;
+        }
+        const founded = await this.getTopPlayersRevenue(9);
+        await this.cacheService.set('topPlayersRevenue', founded, Constants.oneMonth());
+        return founded;
     }
 }

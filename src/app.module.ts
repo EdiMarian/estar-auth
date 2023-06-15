@@ -8,9 +8,26 @@ import { AdminModule } from './admin/admin.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrderModule } from './order/order.module';
 import { RevenueModule } from './revenue/revenue.module';
+import { CacheModule, RedisCacheModuleOptions } from '@multiversx/sdk-nestjs-cache';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal: true}), AuthModule, UserModule, CosmosModule, ShopModule, AdminModule, StripeModule, OrderModule, RevenueModule],
+  imports: [
+    ConfigModule.forRoot({isGlobal: true}),
+    CacheModule.forRoot({
+      config: {
+        host: '127.0.0.1',
+        port: 6379,
+      }
+    } as RedisCacheModuleOptions),
+    AuthModule,
+    UserModule,
+    CosmosModule,
+    ShopModule,
+    AdminModule,
+    StripeModule,
+    OrderModule,
+    RevenueModule
+  ],
   controllers: [],
   providers: [],
 })
