@@ -167,6 +167,13 @@ export class UserRepository {
 
         // Get the user
         const user = await this.findOne(userId, { withAddresses: true, withVip: true });
+        
+        const userAddresses = user.addresses;
+        const userVip = user.vip;
+
+        // delete the user addresses and vip
+        delete user.addresses;
+        delete user.vip;
 
         // Add the address to the user
         user.addressesIDs.push(userAddress.id);
@@ -174,7 +181,7 @@ export class UserRepository {
         // Update the user
         const { resource } = await this.cosmosService.users().item(userId, userId).replace<User>(user);
         return {
-            ...cleanDocument<User>(resource, '', true),
+            ...cleanDocument<User>({...resource, addresses: userAddresses, vip: userVip}, '', true),
         }
     }
 
