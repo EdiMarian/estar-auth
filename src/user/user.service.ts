@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { ApiNetworkProvider } from '@multiversx/sdk-network-providers/out';
 import { UserRepository } from './repository/user.repository';
 import { User, UserAddress, UserConnected, UserTokens } from 'src/common/types';
@@ -12,6 +12,7 @@ import { collections } from 'src/common/constants';
 
 @Injectable()
 export class UserService {
+    private readonly logger = new Logger(UserService.name);
     private readonly apiProvider: ApiNetworkProvider;
     constructor(
         private readonly userRepository: UserRepository,
@@ -48,13 +49,18 @@ export class UserService {
         if(chainAddress) {
             const params = new URLSearchParams();
             params.append('identifiers', tokens.map((token) => token).join(','));
-            const tokensFound = await this.apiProvider.doGetGeneric(`accounts/${chainAddress.address}/tokens?${params.toString()}`);
-            return tokensFound.map((token) => {
-                return {
-                    identifier: token.identifier,
-                    balance: token.balance / 10 ** token.decimals,
-                }
-            });
+            try {
+                const tokensFound = await this.apiProvider.doGetGeneric(`accounts/${chainAddress.address}/tokens?${params.toString()}`);
+                return tokensFound.map((token) => {
+                    return {
+                        identifier: token.identifier,
+                        balance: token.balance / 10 ** token.decimals,
+                    }
+                });
+            } catch (error) {
+                this.logger.error(error);
+                return [];
+            }
         }
         return [];
     }
@@ -69,8 +75,13 @@ export class UserService {
                 params.append('collections', collections.map((collection) => collection).join(','));
             }
             params.append('size', '10000');
-            const nftsFound = await this.apiProvider.doGetGeneric(`accounts/${chainAddress.address}/nfts?${params.toString()}`);
-            return nftsFound;
+            try {
+                const nftsFound = await this.apiProvider.doGetGeneric(`accounts/${chainAddress.address}/nfts?${params.toString()}`);
+                return nftsFound;
+            } catch (error) {
+                this.logger.error(error);
+                return [];
+            }
         }
         return
     }
