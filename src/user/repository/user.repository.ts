@@ -19,6 +19,11 @@ export class UserRepository {
 
     async findOne(id: string, args: FindUserArgs): Promise<User> {
         const { resource } = await this.cosmosService.users().item(id, id).read<User>();
+
+        if(!resource) {
+            return null;
+        }
+        
         if (args.withAddresses) {
             const addresses = await this.findUserAddresses(id);
             resource.addresses = addresses;

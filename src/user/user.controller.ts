@@ -42,7 +42,7 @@ export class UserController {
     }
 
     @Patch('/me/link-address')
-    async linkAddress(@Body() dto: LinkAddressDto, @GetUser('id') id: string): Promise<User> {
-        return await this.userService.linkAddress(dto, id);
+    async linkAddress(@Body() dto: LinkAddressDto, @GetUser() user: User): Promise<User> {
+        return {...await this.userService.linkAddress(dto, user.id), connected: user.connected};
     }
 }
