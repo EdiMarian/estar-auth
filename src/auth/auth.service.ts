@@ -95,7 +95,7 @@ export class AuthService {
             address
         }
         return this.jwtService.signAsync(payload, {
-            expiresIn: '60m',
+            expiresIn: '24h',
             secret: this.configService.get("JWT_SECRET")
         })
     }
