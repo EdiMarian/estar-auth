@@ -44,7 +44,9 @@ export class AuthService {
             throw new ForbiddenException("Invalid username");
         }
         
-        if(listOfNegativeWords.some(negativeWord => username.includes(negativeWord))) throw new ForbiddenException("Your username contains bad words");
+        if(chain !== chains[1]) {
+            if(listOfNegativeWords.some(negativeWord => username.includes(negativeWord))) throw new ForbiddenException("Your username contains bad words");
+        }
 
         // Create User
         const user = await this.userRepository.createUser(dto);

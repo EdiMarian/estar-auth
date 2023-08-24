@@ -1,4 +1,9 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -8,16 +13,19 @@ import { AdminModule } from './admin/admin.module';
 import { StripeModule } from './stripe/stripe.module';
 import { OrderModule } from './order/order.module';
 import { RevenueModule } from './revenue/revenue.module';
-import { CacheModule, RedisCacheModuleOptions } from '@multiversx/sdk-nestjs-cache';
+import {
+  CacheModule,
+  RedisCacheModuleOptions,
+} from '@multiversx/sdk-nestjs-cache';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
+    ConfigModule.forRoot({ isGlobal: true }),
     CacheModule.forRoot({
       config: {
         host: '127.0.0.1',
         port: 6379,
-      }
+      },
     } as RedisCacheModuleOptions),
     AuthModule,
     UserModule,
@@ -26,7 +34,7 @@ import { CacheModule, RedisCacheModuleOptions } from '@multiversx/sdk-nestjs-cac
     AdminModule,
     StripeModule,
     OrderModule,
-    RevenueModule
+    RevenueModule,
   ],
   controllers: [],
   providers: [],
