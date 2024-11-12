@@ -6,15 +6,17 @@ import { AuthGuard } from './guard';
 @UseGuards(AuthGuard)
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-    @Post("/register")
-    register(@Body() dto: RegisterDto) {
-        return this.authService.register(dto);
-    }
+  @Post('/register')
+  register(@Body() dto: RegisterDto) {
+    console.log(dto);
+    return this.authService.register(dto);
+  }
 
-    @Post("/login")
-    loginWeb3(@Body() dto: LoginDto) {
-        return this.authService.login(dto)
-    }
+  @Post('/login')
+  loginWeb3(@Body() dto: LoginDto) {
+    console.log(dto);
+    return this.authService.login(dto);
+  }
 }
