@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  username            String
+  diamonds            Int
+  addressesIDs        String[]
+  vipID               String
+  roles               String[]
+  subscriptionID      String?
+  activityPaymentsIDs String[]
+  addresses           UserAddress[]
+  vip                 UserVips?          @relation(fields: [userVipsId], references: [id])
+  subscription        UserSubscriptions? @relation(fields: [userSubscriptionsId], references: [id])
+  activityPayments    String[]
+  userVipsId          String?            @db.ObjectId
+  userSubscriptionsId String?            @db.ObjectId
+}
+
+model Order {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  status String
+  amount Float
+}
+
+model UserAddress {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  userId  String @db.ObjectId
+  chain   String
+  address String
+  User    User   @relation(fields: [userId], references: [id])
+}
+
+model UserVips {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  level  Int
+  xp     Int
+  User   User[]
+}
+
+model UserSubscriptions {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  User   User[]
+}

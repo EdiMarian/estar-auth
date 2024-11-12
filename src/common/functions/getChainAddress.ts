@@ -1,5 +1,3 @@
-import { UserAddress } from "../types";
-
-export const getChainAddress = (arr: UserAddress[], chainId: string): UserAddress => {
-    return arr.find((address) => address.chain === chainId);
-}
+export const getChainAddress = (arr: any[], chainId: string): any => {
+  return arr.find((address) => address.chain === chainId);
+};
