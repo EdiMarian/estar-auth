@@ -1,157 +1,146 @@
-import { Injectable, UnauthorizedException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
-import { RegisterWeb2Dto, LoginWeb2Dto, LoginWeb3Dto, RegisterWeb3Dto } from './dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import axios from 'axios';
-import { Address } from '@multiversx/sdk-core/out';
+import { LoginDto, RegisterDto } from './dto';
+import { UserRepository } from '../user/repository/user.repository';
+import { isValidString } from 'src/common/functions';
+import { Token } from 'src/common/types';
+import { listOfNegativeWords } from 'src/common/constants';
 
 @Injectable()
 export class AuthService {
-    constructor(private prismaService: PrismaService, private jwtService: JwtService, private configService: ConfigService) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
-    async registerWeb2(dto: RegisterWeb2Dto): Promise<any> {
-        try {
-            // check google token
-            const { email } = await this.verifyGoogleToken(dto.token);
+  async register(dto: RegisterDto): Promise<Token> {
+    // Deconstruct DTO
+    const { username, chain, address } = dto;
 
-            // check if email is already taken
-            const emailTaken = await this.prismaService.user.findFirst({
-                where: {
-                    email: email,
-                }
-            });
-
-            if(emailTaken) throw new ForbiddenException("This email is already taken!");
-
-            // create user
-            const user = await this.prismaService.user.create({
-                data: {
-                    email: email,
-                    username: dto.username
-                }
-            });
-            return this.signWeb2Token(user.id, user.email, user.username);
-            } catch (err) {
-                if(err instanceof PrismaClientKnownRequestError) {
-                    if(err.code === 'P2002') {
-                        if(err.meta.target === 'users_username_key') {
-                            throw new ForbiddenException("This username is already taken!");
-                        }
-                    }
-                }
-                throw err;
-            }
+    // Chain validation
+    const chains = this.getChains();
+    if (!chains.includes(chain)) {
+      throw new ForbiddenException('Chain not supported');
     }
 
-    async registerWeb3(dto: RegisterWeb3Dto): Promise<any> {
-        try {
-            // check erd address
-            new Address(dto.address);
-
-            // check if address is already taken
-            const addressTaken = await this.prismaService.user.findFirst({
-                where: {
-                    address: dto.address,
-                }
-            });
-
-            if(addressTaken) throw new ForbiddenException("This address is already taken!");
-
-            // create user
-            const user = await this.prismaService.user.create({
-                data: {
-                    address: dto.address,
-                    username: dto.username
-                }
-            });
-
-            return this.signWeb3Token(user.id, user.address, user.username);
-            } catch (err) {
-                if(err instanceof PrismaClientKnownRequestError) {
-                    if(err.code === 'P2002') {
-                        if(err.meta.target === 'users_username_key') {
-                            throw new ForbiddenException("This username is already taken!");
-                        }
-                    }
-                }
-                throw err;
-            }
+    // Address Validation
+    if (chain === chains[0]) {
+      const { email } = await this.verifyGoogleToken(address);
+      dto.address = email;
     }
 
-    async loginWeb2(dto: LoginWeb2Dto): Promise<string> {
-        try {
-            // check google token
-            const { email } = await this.verifyGoogleToken(dto.token);
-
-            // check user exists
-            const user = await this.prismaService.user.findFirst({
-                where: {
-                    email: email
-                }
-            });
-            if(!user) throw new NotFoundException('User not found!');
-
-            return this.signWeb2Token(user.id, user.email, user.username);
-            } catch (err) {
-                throw new UnauthorizedException(err.message);
-            }
+    const addressesFound = await this.userRepository.findAddress(dto.address);
+    if (addressesFound.length > 0) {
+      throw new ForbiddenException('Address already exists');
     }
 
-    async loginWeb3(dto: LoginWeb3Dto): Promise<string> {
-        try {
-            // check erd address
-            new Address(dto.address);
-
-            // check user exists
-            const user = await this.prismaService.user.findFirst({
-                where: {
-                    address: dto.address
-                }
-            });
-            if(!user) throw new NotFoundException('User not found!');
-
-            return this.signWeb3Token(user.id, user.address, user.username);
-            } catch (err) {
-                throw new UnauthorizedException(err.message);
-            }
+    // Username Validation
+    const usernamesFound = await this.userRepository.findUsername(username);
+    if (usernamesFound.length > 0) {
+      throw new ForbiddenException('Username already exists');
     }
 
-    async verifyGoogleToken(token: string): Promise<{email: string, email_verified: true, locale: true}> {
-        try {
-            const { data } = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-            return data;
-        } catch (err) {
-            throw new UnauthorizedException(err.message);
-        }
+    if (!isValidString(username)) {
+      throw new ForbiddenException('Invalid username');
     }
 
-    signWeb2Token(userId: string, email: string, username: string): Promise<string> {
-        const payload = {
-            sub: userId,
-            email,
-            username
-        }
-        return this.jwtService.signAsync(payload, {
-            expiresIn: '60m',
-            secret: this.configService.get("JWT_SECRET")
-        })
+    if (chain !== chains[1]) {
+      if (
+        listOfNegativeWords.some((negativeWord) =>
+          username.includes(negativeWord),
+        )
+      )
+        throw new ForbiddenException('Your username contains bad words');
     }
 
-    signWeb3Token(userId: string, address: string, username: string): Promise<string> {
-        const payload = {
-            sub: userId,
-            address,
-            username
-        }
-        return this.jwtService.signAsync(payload, {
-            expiresIn: '60m',
-            secret: this.configService.get("JWT_SECRET")
-        })
+    // Create User
+    const user = await this.userRepository.createUser(dto);
+    return {
+      token: await this.signToken(user.id, user.username, chain, dto.address),
+    };
+  }
+
+  async login(dto: LoginDto): Promise<Token> {
+    const { chain, address } = dto;
+
+    // Chain validation
+    const chains = this.getChains();
+    if (!chains.includes(chain)) {
+      throw new ForbiddenException('Chain not supported');
     }
+
+    // Address Validation
+    if (chain === chains[0]) {
+      const { email } = await this.verifyGoogleToken(address);
+      dto.address = email;
+    }
+
+    const addressesFound = await this.userRepository.findAddress(dto.address);
+    if (addressesFound.length === 0) {
+      throw new UnauthorizedException('Address not found');
+    }
+
+    // Get User
+    const user = await this.userRepository.findOne(
+      addressesFound[0].userId,
+      {},
+    );
+
+    // Validate User
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    // Sign Token
+    return {
+      token: await this.signToken(user.id, user.username, chain, dto.address),
+    };
+  }
+
+  signToken(
+    userId: string,
+    username: string,
+    chain: string,
+    address: string,
+  ): Promise<string> {
+    const payload = {
+      sub: userId,
+      username,
+      chain,
+      address,
+    };
+    return this.jwtService.signAsync(payload, {
+      expiresIn: '24h',
+      secret: this.configService.get('JWT_SECRET'),
+    });
+  }
+
+  getChains(): string[] {
+    return this.configService.get('SUPPORTED_CHAINS').split(',');
+  }
+
+  async verifyGoogleToken(
+    token: string,
+  ): Promise<{ email: string; email_verified: true; locale: true }> {
+    try {
+      const { data } = await axios.get(
+        'https://www.googleapis.com/oauth2/v3/userinfo',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return data;
+    } catch (err) {
+      throw new UnauthorizedException(['Invalid Google Token!', err.message]);
+    }
+  }
 }

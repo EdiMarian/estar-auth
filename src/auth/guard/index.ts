@@ -1,1 +1,2 @@
-export * from './jwt.gurad'
+export * from './jwt.guard'
+export * from './auth.guard'

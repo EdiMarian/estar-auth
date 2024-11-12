@@ -1,2 +1,2 @@
-export * from './LinkAddress.dto'
-export * from './LinkEmail.dto'
+export * from './link-address.dto';
+export * from './create-user-subscription.dto';
