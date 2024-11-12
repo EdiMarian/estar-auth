@@ -25,7 +25,7 @@ import {
       config: {
         host: '127.0.0.1',
         password: '1NgwNcfvDHUjAGIzXB0SPw9m5LvDmxsD599GNr8yqQgOaSf7Bp',
-        port: 6379,
+        port: 6479,
       },
     } as RedisCacheModuleOptions),
     AuthModule,
