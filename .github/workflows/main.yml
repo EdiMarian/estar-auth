@@ -15,11 +15,11 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
+          port: 2121
           script: |
-            cd /home/estar-games/hub/server
+            cd /home/estargames/hub/server
             git checkout main
             git pull
             npm install
             npm run build
-            pm2 restart estar-games/mainnet-hub-server
+            pm2 restart estargames/mainnet-hub-server
